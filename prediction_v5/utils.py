@@ -206,6 +206,7 @@ def compute_chapter_metrics(model, X, y):
 
 
 def create_sequence_model(
+    feature_cols: list[str],
     rnn_cls: str = "rnn",
     rnn_units: int = 32,
     dropout_rate: float = 0.5,
@@ -214,13 +215,14 @@ def create_sequence_model(
     rnn_cls_by_name = {"rnn": SimpleRNN, "lstm": LSTM, "gru": GRU}
     rnn_cls = rnn_cls_by_name[rnn_cls]
 
+    n_features = len(feature_cols) // 12
+
     model = Sequential()
-    model.add(Input(shape=(12, 11)))
+    model.add(Input(shape=(12, n_features)))
     model.add(Masking(mask_value=np.nan))
     model.add(
         rnn_cls(
             units=rnn_units,
-            # input_shape=(12, 11),
             dropout=dropout_rate,
             return_sequences=False,
             kernel_regularizer=l2(0.01),
