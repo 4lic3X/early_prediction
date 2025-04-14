@@ -51,7 +51,9 @@ class QuestionType(Enum):
 class Dataset:
     RAW_DATA_PATH = "../data/raw"
 
-    def __init__(self, name: str, final_grade_column: str) -> None:
+    def __init__(
+        self, name: str, final_grade_column: str, multi_class: bool = False
+    ) -> None:
         """
         name: str, the name of the dataset, also the folder name to load data from
         final_grade_column: str, the name of the column
@@ -89,11 +91,23 @@ class Dataset:
         g = g[g.notna().all(axis=1)]
 
         # Generate label for final grade
-        # Pos: low performance students, needs intervention
-        # Neg: high performance students, no need for intervention
-        g["label"] = g["final_grade"].apply(
-            lambda x: 0 if x in ["A", "A+", "A-"] else 1
-        )
+        if multi_class:
+            # Multi-class classification
+            # 0 if A, A+, A-
+            # 1 if B, B+, B-
+            # 2 if below B, requires intervention
+            g["label"] = g["final_grade"].apply(
+                lambda x: (
+                    0 if x in ["A", "A+", "A-"] else 1 if x in ["B", "B+", "B-"] else 2
+                )
+            )
+        else:
+            # Binary classification
+            # Pos: low performance students, needs intervention
+            # Neg: high performance students, no need for intervention
+            g["label"] = g["final_grade"].apply(
+                lambda x: 0 if x in ["A", "A+", "A-"] else 1
+            )
 
         self.responses = r
         self.views = v
