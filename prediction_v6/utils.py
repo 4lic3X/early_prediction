@@ -350,14 +350,16 @@ def plot_metrics_subplots(
 
     metrics_names = [
         "ROC_AUC",
-        "PR_AUC",
+        # "PR_AUC",  # Exclude PR-AUC for now as the computation isn't accurate
         "Accuracy",
         "Precision",
         "Recall",
         "F1",
         "Class2_ROC_AUC",
-        "Class2_PR_AUC",
+        # "Class2_PR_AUC",
+        "Class2_Precision",
         "Class2_Recall",
+        "Class2_F1",
     ]
 
     metrics["Model"] = metrics["Model"].apply(
