@@ -340,7 +340,10 @@ def plot_metrics(metrics: pd.DataFrame, metrics_name: str):
 
 
 def plot_metrics_subplots(
-    metrics: pd.DataFrame, exclude_models: Optional[list[str]] = None, limit_y=True
+    metrics: pd.DataFrame,
+    exclude_models: Optional[list[str]] = None,
+    limit_y=True,
+    metrics_to_plot: Optional[list[str]] = None,
 ):
     metrics = metrics.copy()
 
@@ -348,7 +351,7 @@ def plot_metrics_subplots(
     sns.set_context("talk")
     sns.set_palette("tab10")
 
-    metrics_names = [
+    default_metrics_names = [
         "ROC_AUC",
         # "PR_AUC",  # Exclude PR-AUC for now as the computation isn't accurate
         "Accuracy",
@@ -362,6 +365,11 @@ def plot_metrics_subplots(
         "Class2_F1",
     ]
 
+    if metrics_to_plot is None:
+        metrics_names = default_metrics_names
+    else:
+        metrics_names = [m for m in metrics_to_plot if m in default_metrics_names]
+
     metrics["Model"] = metrics["Model"].apply(
         lambda x: {
             "Original": "RF Original",
@@ -371,9 +379,20 @@ def plot_metrics_subplots(
         or x
     )
 
-    # Set up the subplots with 3 rows and 2 columns
-    fig, axes = plt.subplots(3, 3, figsize=(24, 18))
+    # Calculate number of rows needed (ceiling division to round up)
+    n_metrics = len(metrics_names)
+    n_cols = 3
+    n_rows = (
+        n_metrics + n_cols - 1
+    ) // n_cols  # Equivalent to math.ceil(n_metrics/n_cols)
+
+    # Set up the subplots with dynamic rows and 3 columns
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(24, 6 * n_rows))
     axes = axes.flatten()  # Flatten the 2D array of axes to 1D for easy iteration
+
+    # Hide any extra subplots that aren't needed
+    for idx in range(n_metrics, len(axes)):
+        axes[idx].set_visible(False)
 
     # Keep track of the lines and labels for the legend
     handles = []
