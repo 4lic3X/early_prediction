@@ -381,13 +381,13 @@ def plot_metrics_subplots(
 
     # Calculate number of rows needed (ceiling division to round up)
     n_metrics = len(metrics_names)
-    n_cols = 3
+    n_cols = 2
     n_rows = (
         n_metrics + n_cols - 1
     ) // n_cols  # Equivalent to math.ceil(n_metrics/n_cols)
 
     # Set up the subplots with dynamic rows and 3 columns
-    fig, axes = plt.subplots(n_rows, n_cols, figsize=(24, 6 * n_rows))
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(24, 8 * n_rows))
     axes = axes.flatten()  # Flatten the 2D array of axes to 1D for easy iteration
 
     # Hide any extra subplots that aren't needed
@@ -413,9 +413,12 @@ def plot_metrics_subplots(
             errorbar=None,
             ax=ax,  # Use the specific subplot axis
         )
-        ax.set_title(metrics_name)
+        ax.set_title(metrics_name.replace("_", " "))
         ax.set_xticks(range(1, 13))
         ax.set_xticklabels(range(1, 13))
+
+        # Set y-axis name
+        ax.set_ylabel(metrics_name.replace("_", " "))
 
         # set y limit to 0-1
         if limit_y:
@@ -445,7 +448,7 @@ def plot_metrics_subplots(
     )
 
     # Adjust layout to prevent overlap
-    plt.tight_layout(rect=[0, 0, 1, 0.95])  # Adjust for space for the legend
+    plt.tight_layout(rect=[0, 0, 1, 0.9])  # Adjust for space for the legend
 
 
 def evaluate_model(model_cls, data, trials=5):
